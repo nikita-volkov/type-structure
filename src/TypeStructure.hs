@@ -11,10 +11,17 @@ import TypeStructure.Prelude.Data
 import TypeStructure.Graph
 import TypeStructure.Class
 import TypeStructure.TH
+import qualified Language.Haskell.TH as TH
 
--- $(
---   fmap join $ mapM derive $
---     [
---       ''Text
---     ]
---   )
+
+$(
+  fmap join $ mapM derive $
+    [
+      ''Int, 
+      ''Text, 
+      ''(->),
+      ''()
+    ] ++
+    map TH.tupleTypeName [2..7]
+  )
+

@@ -49,6 +49,8 @@ library
     TypeStructure.Prelude.Transformers
   exposed-modules:
     TypeStructure
+  ghc-options:
+    -ddump-splices
   build-depends:
     -- data:
     bytestring,
