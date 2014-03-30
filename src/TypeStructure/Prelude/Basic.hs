@@ -62,7 +62,7 @@ traceM s = trace s $ return ()
 
 bug = [e| $(Debug.Trace.LocationTH.failure) . (msg <>) |]
   where
-    msg = "A \"remotion\" package bug: " :: String
+    msg = "A \"type-structure\" package bug: " :: String
 
 bottom = [e| $bug "Bottom evaluated" |]
 
