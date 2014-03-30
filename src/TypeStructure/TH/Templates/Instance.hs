@@ -95,10 +95,10 @@ render (name, vars, tcs, ds, ndr, rthi) =
           exp = TypeCon.render tcs
 
 type Settings = 
-  (Name, TypeVars, TypeCon.Settings, Declaration.Settings, ReferredTypesDictionaryRecords, ReferredTypesHavingInstances)
+  (Name, [TypeVar], TypeCon.Settings, Declaration.Settings, [InlinedDeclaration], [InheritedDictionary])
 
-type TypeVars = [Name]
+type TypeVar = Name
 
-type ReferredTypesDictionaryRecords = [(TypeCon.Settings, Declaration.Settings)]
+type InlinedDeclaration = (TypeCon.Settings, Declaration.Settings)
 
-type ReferredTypesHavingInstances = [Type]
+type InheritedDictionary = Type
