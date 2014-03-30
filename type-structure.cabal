@@ -41,12 +41,17 @@ library
   hs-source-dirs:
     src
   other-modules:
+    TypeStructure.TH.Templates.Instance
+    TypeStructure.TH.Templates.TypeCon
+    TypeStructure.TH.Templates.Type
+    TypeStructure.TH.Templates.Declaration
+    TypeStructure.TH
     TypeStructure.Graph
     TypeStructure.Class
-    TypeStructure.TH
     TypeStructure.Prelude.Basic
     TypeStructure.Prelude.Data
     TypeStructure.Prelude.Transformers
+    TypeStructure.Prelude.TH
   exposed-modules:
     TypeStructure
   ghc-options:

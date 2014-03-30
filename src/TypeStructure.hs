@@ -11,12 +11,13 @@ import TypeStructure.Prelude.Data
 import TypeStructure.Graph
 import TypeStructure.Class
 import TypeStructure.TH
-import qualified Language.Haskell.TH as TH
+import qualified TypeStructure.Prelude.TH as TH
 
 
 $(
   fmap join $ mapM derive $
     [
+      ''[],
       ''Int, 
       ''Text, 
       ''(->),
