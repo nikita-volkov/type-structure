@@ -33,14 +33,14 @@ import qualified TypeStructure.TH.Templates.Type as Type
 import qualified Data.HashMap.Strict as HashMap
 
 render :: Settings -> Dec
-render (name, vars, tcs, ds, ndr, rthi) =
+render (name, vars, tcs, dictionaryRecords, inheritedDictionaries) =
   InstanceD 
     context 
     (ConT ''C.TypeStructure `AppT` headType) 
     [graphDec]
   where
     context = flip map varTypes $ (ClassP ''C.TypeStructure . pure)
-    varTypes = map VarT vars
+    varTypes = map (VarT . mkName) vars
     headType = foldl AppT (ConT name) varTypes
     graphDec = FunD 'C.graph [Clause [] (NormalB exp) [finalTypeDec, dictionaryDec, typeConDec]] 
       where
@@ -59,34 +59,25 @@ render (name, vars, tcs, ds, ndr, rthi) =
           exp = purify
             [e|
               let
-                newRecords = currentRecord : recordsOfReferredTypes where
-                  currentRecord = purify
-                    $([e| 
-                      let 
-                        typeCon = $(varE $ mkName $ "typeCon")
-                        declaration = $(return $ Declaration.render ds)
-                        in (typeCon, declaration)
-                    |])
-                  recordsOfReferredTypes = 
-                    $(
-                      return $ ListE $ flip map ndr $ \(tcs, ds) ->
-                        -- let 
-                        --   tc = return $ TypeCon.render tcs
-                        --   d = return $ Declaration.render ds
-                        --   in purify $ [e| ($tc, $d) |]
-                        purify 
-                          [e|
-                            let 
-                              typeCon = $(return $ TypeCon.render tcs)
-                              declaration = $(return $ Declaration.render ds)
-                              in (typeCon, declaration)
-                          |]
-                    )
+                newRecords = $(
+                    return $ ListE $ flip map dictionaryRecords $ \(tcs, ds) ->
+                      -- let 
+                      --   tc = return $ TypeCon.render tcs
+                      --   d = return $ Declaration.render ds
+                      --   in purify $ [e| ($tc, $d) |]
+                      purify 
+                        [e|
+                          let 
+                            typeCon = $(return $ TypeCon.render tcs)
+                            declaration = $(return $ Declaration.render ds)
+                            in (typeCon, declaration)
+                        |]
+                  )
                 inheritedDictionary = 
                   mconcat $ dicsOfTypeVars ++ dicsOfReferredTypes
                   where
                     dicsOfTypeVars = $(return $ ListE $ map dictionaryExp varTypes)
-                    dicsOfReferredTypes = $(return $ ListE $ map dictionaryExp rthi)
+                    dicsOfReferredTypes = $(return $ ListE $ map dictionaryExp inheritedDictionaries)
                 in foldr (\(k, v) -> HashMap.insert k v) inheritedDictionary newRecords
             |]
             where
@@ -95,10 +86,10 @@ render (name, vars, tcs, ds, ndr, rthi) =
           exp = TypeCon.render tcs
 
 type Settings = 
-  (Name, [TypeVar], TypeCon.Settings, Declaration.Settings, [InlinedDeclaration], [InheritedDictionary])
+  (Name, [TypeVar], TypeCon.Settings, [DictionaryRecord], [InheritedDictionary])
 
-type TypeVar = Name
+type TypeVar = String
 
-type InlinedDeclaration = (TypeCon.Settings, Declaration.Settings)
+type DictionaryRecord = (TypeCon.Settings, Declaration.Settings)
 
 type InheritedDictionary = Type

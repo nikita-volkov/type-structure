@@ -63,6 +63,7 @@ library
     hashable,
     unordered-containers == 0.2.*,
     -- control:
+    lens,
     transformers,
     mtl,
     -- debugging:

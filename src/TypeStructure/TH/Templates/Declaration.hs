@@ -32,18 +32,18 @@ render :: Settings -> Exp
 render = \case
   Primitive -> purify [e| G.Dec_Primitive |]
   ADT vars constructors -> purify [e| G.Dec_ADT $varsE $consE |] where
-    varsE = listE $ map (stringE . nameBase) vars
+    varsE = listE $ map stringE vars
     consE = listE $ map renderCons constructors
       where
         renderCons (n, tss) = [e| ($nameE, $typesE) |] where
-          nameE = stringE $ nameBase $ n
+          nameE = stringE $ n
           typesE = listE $ map (return . Type.render) tss
 
 data Settings = 
   Primitive |
   ADT [Var] [Constructor]
 
-type Var = Name
+type Var = String
 
-type Constructor = (Name, [Type.Settings])
+type Constructor = (String, [Type.Settings])
 
