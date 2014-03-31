@@ -3,7 +3,8 @@ module TypeStructure.TH.Analysis where
 import TypeStructure.Prelude.Basic
 import TypeStructure.Prelude.Transformers
 import TypeStructure.Prelude.Data
-import qualified Language.Haskell.TH as T
+import qualified TypeStructure.Prelude.TH as T
+import qualified TypeStructure.Class as Class
 
 
 -- NOTE!
@@ -53,22 +54,6 @@ adaptTypeConName n = do
   ns <- T.nameModule n
   return (ns, T.nameBase n)
 
-referredTypes :: T.Info -> [T.Type]
-referredTypes = \case
-  T.TyConI d -> case d of
-    T.DataD _ _ _ cons _ -> conTypes =<< cons
-    T.NewtypeD _ _ _ con _ -> conTypes $ con
-    d -> $bug $ "Unsupported dec: " <> show d
-  T.PrimTyConI n arity _ -> []
-  i -> $bug $ "Unsupported info: " <> show i
-  where
-    conTypes :: T.Con -> [T.Type]
-    conTypes = \case
-      T.NormalC n ts -> map snd ts
-      T.RecC n ts -> map (\(_, _, t) -> t) ts
-      T.InfixC (_, l) n (_, r) -> [l, r]
-      c -> $bug $ "Unexpected constructor: " <> show c
-
 infoToDeclaration :: T.Info -> Declaration
 infoToDeclaration = \case
   T.TyConI d -> case d of
@@ -81,7 +66,7 @@ infoToDeclaration = \case
     adt vars cons = ADT vars' cons' where
       vars' = flip map vars $ \case
         T.PlainTV n -> T.nameBase n
-        v -> $bug $ "Unexpected type of var: " <> show v
+        T.KindedTV n k -> T.nameBase n
       cons' = flip map cons $ \case
         T.NormalC n ts -> (T.nameBase n, map (\(_, t) -> adaptType t) ts)
         T.RecC n ts -> (T.nameBase n, map (\(_, _, t) -> adaptType t) ts)
