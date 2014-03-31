@@ -4,7 +4,7 @@ module TypeStructure.TH.Template where
 import TypeStructure.Prelude.Basic
 import TypeStructure.Prelude.Transformers
 import TypeStructure.Prelude.Data
-import TypeStructure.TH.Analysis
+import TypeStructure.TH.Model
 import qualified TypeStructure.Prelude.TH as T
 import qualified TypeStructure.Model as M
 import qualified TypeStructure.Class as C
@@ -53,7 +53,7 @@ renderTypeCon (ns, n) = T.purify [e| ($(T.stringE ns), $(T.stringE n)) |]
 -- 
 renderDeclaration :: Declaration -> T.Exp
 renderDeclaration = \case
-  Primitive -> T.purify [e| M.Declaration_Primitive |]
+  Primitive _ -> T.purify [e| M.Declaration_Primitive |]
   ADT vars constructors -> T.purify [e| M.Declaration_ADT $varsE $consE |] where
     varsE = T.listE $ map T.stringE vars
     consE = T.listE $ map renderCons constructors
@@ -61,6 +61,9 @@ renderDeclaration = \case
         renderCons (n, tss) = [e| ($nameE, $typesE) |] where
           nameE = T.stringE $ n
           typesE = T.listE $ map (return . renderType) tss
+  Synonym vars t -> T.purify [e| M.Declaration_Synonym $varsE $typeE |] where
+    varsE = T.listE $ map T.stringE vars
+    typeE = return $ renderType t
 
 -- |
 -- @

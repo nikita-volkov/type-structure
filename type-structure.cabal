@@ -41,7 +41,7 @@ library
   hs-source-dirs:
     src
   other-modules:
-    TypeStructure.TH.Analysis
+    TypeStructure.TH.Model
     TypeStructure.TH.Template
     TypeStructure.TH
     TypeStructure.Model
@@ -54,10 +54,14 @@ library
     TypeStructure
   build-depends:
     -- data:
+    time,
+    vector,
+    array,
     bytestring,
     text,
     hashable,
-    unordered-containers == 0.2.*,
+    unordered-containers,
+    containers,
     -- control:
     transformers,
     mtl,
@@ -121,10 +125,14 @@ test-suite type-structure-htf-test-suite
     HUnit,
     HTF == 0.11.*,
     -- data:
+    time,
+    vector,
+    array,
     bytestring,
     text,
     hashable,
-    unordered-containers == 0.2.*,
+    unordered-containers,
+    containers,
     -- control:
     transformers,
     mtl,
