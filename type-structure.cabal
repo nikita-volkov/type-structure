@@ -41,12 +41,15 @@ library
   hs-source-dirs:
     src
   other-modules:
-    TypeStructure.Graph
-    TypeStructure.Class
+    TypeStructure.TH.Analysis
+    TypeStructure.TH.Template
     TypeStructure.TH
+    TypeStructure.Model
+    TypeStructure.Class
     TypeStructure.Prelude.Basic
     TypeStructure.Prelude.Data
     TypeStructure.Prelude.Transformers
+    TypeStructure.Prelude.TH
   exposed-modules:
     TypeStructure
   ghc-options:
@@ -58,6 +61,7 @@ library
     hashable,
     unordered-containers == 0.2.*,
     -- control:
+    lens,
     transformers,
     mtl,
     -- debugging:
