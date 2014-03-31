@@ -41,6 +41,7 @@ library
   hs-source-dirs:
     src
   other-modules:
+    TypeStructure.TH.Analysis
     TypeStructure.TH.Templates.Instance
     TypeStructure.TH.Templates.TypeCon
     TypeStructure.TH.Templates.Type
