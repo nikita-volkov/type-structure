@@ -4,7 +4,6 @@ import TypeStructure.Prelude.Basic
 import TypeStructure.Prelude.Transformers
 import TypeStructure.Prelude.Data
 import TypeStructure.Prelude.TH
-import Control.Lens
 import qualified TypeStructure.Class as Class
 import qualified TypeStructure.TH.Analysis as A
 import qualified TypeStructure.TH.Template as Template
