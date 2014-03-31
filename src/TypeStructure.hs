@@ -15,6 +15,7 @@ import TypeStructure.Model
 import TypeStructure.Class
 import TypeStructure.TH
 import qualified TypeStructure.Prelude.TH as TH
+import qualified GHC.Exts
 
 
 
@@ -38,19 +39,20 @@ derive ''Float
 derive ''Double
 derive ''Char
 derive ''Bool
-derive ''Any
-derive ''All
 derive ''Ordering
 derive ''Fixed
 derive ''Ratio
 derive ''Last
 derive ''First
-derive ''Product
+derive ''Any
+derive ''All
 derive ''Sum
+derive ''Product
 derive ''Dual
 derive ''Seq
 derive ''Maybe
 derive ''Either
+derive ''GHC.Exts.Any
 
 -- tuples
 fmap join $ mapM derive $ map TH.tupleTypeName [2..24]
