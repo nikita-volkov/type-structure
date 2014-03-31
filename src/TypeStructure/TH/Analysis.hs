@@ -3,69 +3,87 @@ module TypeStructure.TH.Analysis where
 import TypeStructure.Prelude.Basic
 import TypeStructure.Prelude.Transformers
 import TypeStructure.Prelude.Data
-import Language.Haskell.TH
-import Control.Lens
-import qualified TypeStructure.Graph as G
-import qualified TypeStructure.TH.Templates.Instance as InstanceTpl
-import qualified TypeStructure.TH.Templates.Declaration as DeclarationTpl
-import qualified TypeStructure.TH.Templates.Type as TypeTpl
-import qualified TypeStructure.TH.Templates.TypeCon as TypeConTpl
+import qualified Language.Haskell.TH as T
 
 
-type Result = (DeclarationTpl.Settings, ReferredTypeCons)
+-- NOTE!
+-- Oddly enough, this model completely replicates the output Model itself, so... 
+-- Refactoring, baby!
 
-type ReferredTypeCons = [Name]
+data Type =
+  App Type Type |
+  Var TypeVar |
+  Con TypeCon
+  deriving (Show, Eq, Ord)
 
-infoAnalysis :: Info -> Result
-infoAnalysis = \case
-  TyConI d -> case d of
-    DataD _ _ vars cons _ -> let 
-      dtvl = map tyVarBndrAnalysis vars
-      (dtcl, rtcl) = unzip $ map conAnalysis $ cons
-      dts = DeclarationTpl.ADT dtvl dtcl
-      in (dts, asum rtcl)
-    NewtypeD _ _ vars con _ -> let 
-      dtvl = map tyVarBndrAnalysis vars
-      (dtc, rtc) = conAnalysis $ con
-      dts = DeclarationTpl.ADT dtvl [dtc]
-      in (dts, rtc)
-    d -> $bug $ "Unexpected type of declaration: " <> show d
-  PrimTyConI n arity _ -> (DeclarationTpl.Primitive, [n])
-  i -> $bug $ "Unexpected type of info: " <> show i
+type TypeCon = (Namespace, Name)
 
-tyVarBndrAnalysis :: TyVarBndr -> (DeclarationTpl.Var)
-tyVarBndrAnalysis = \case
-  PlainTV n -> nameBase n
-  v -> $bug $ "Unexpected type of var: " <> show v
+type Namespace = String
 
-conAnalysis :: Con -> (DeclarationTpl.Constructor, ReferredTypeCons)
-conAnalysis = \case
-  NormalC n ts -> let
-    (ttsl, rtcl) = unzip $ map (\(_, t) -> typeAnalysis t) $ ts
-    in ((nameBase n, ttsl), asum rtcl)
-  RecC n ts -> let
-    (ttsl, rtcl) = unzip $ map (\(_, _, t) -> typeAnalysis t) $ ts
-    in ((nameBase n, ttsl), asum rtcl)
-  InfixC (_, l) n (_, r) -> let
-    (ltts, lrtc) = typeAnalysis l
-    (rtts, rrtc) = typeAnalysis r
-    in ((nameBase n, [ltts, rtts]), lrtc <|> rrtc)
-  c -> $bug $ "Unexpected constructor: " <> show c
+type Name = String
 
-typeAnalysis :: Type -> (TypeTpl.Settings, ReferredTypeCons)
-typeAnalysis = \case
-  AppT l r -> let 
-    (ltts, lrtc) = typeAnalysis l
-    (rtts, rrtc) = typeAnalysis r
-    in (TypeTpl.App ltts rtts, lrtc <|> rrtc)
-  VarT n -> (TypeTpl.Var $ nameBase $ n, empty)
-  ConT n -> (typeConFromName n, pure n)
-  TupleT a -> (typeConFromName $ tupleTypeName a, empty)
-  UnboxedTupleT a -> (typeConFromName $ unboxedTupleTypeName a, empty)
-  ArrowT -> (typeConFromName ''(->), empty)
-  ListT -> (typeConFromName ''[], empty)
+data Declaration = 
+  Primitive |
+  ADT [TypeVar] [Constructor]
+  deriving (Show, Eq, Ord)
+
+type TypeVar = Name
+
+type Constructor = (Name, [Type])
+
+
+adaptType :: T.Type -> Type
+adaptType = \case
+  T.AppT l r -> App (adaptType l) (adaptType r)
+  T.VarT n -> Var $ T.nameBase $ n
+  T.ConT n -> fromName n
+  T.TupleT a -> fromName $ T.tupleTypeName a
+  T.UnboxedTupleT a -> fromName $ T.unboxedTupleTypeName a
+  T.ArrowT -> fromName ''(->)
+  T.ListT -> fromName ''[]
   t -> $bug $ "Unsupported type: " <> show t
   where
-    typeConFromName n = TypeTpl.Con (ns, nameBase n) where
-      ns = nameModule n ?: ($bug $ "Name has no namespace: " <> show n)
+    fromName n = 
+      Con $ 
+        adaptTypeConName n ?: 
+        ($bug $ "Name has no namespace: " <> show n)
 
+adaptTypeConName :: T.Name -> Maybe TypeCon
+adaptTypeConName n = do
+  ns <- T.nameModule n
+  return (ns, T.nameBase n)
+
+referredTypes :: T.Info -> [T.Type]
+referredTypes = \case
+  T.TyConI d -> case d of
+    T.DataD _ _ _ cons _ -> conTypes =<< cons
+    T.NewtypeD _ _ _ con _ -> conTypes $ con
+    d -> $bug $ "Unsupported dec: " <> show d
+  T.PrimTyConI n arity _ -> []
+  i -> $bug $ "Unsupported info: " <> show i
+  where
+    conTypes :: T.Con -> [T.Type]
+    conTypes = \case
+      T.NormalC n ts -> map snd ts
+      T.RecC n ts -> map (\(_, _, t) -> t) ts
+      T.InfixC (_, l) n (_, r) -> [l, r]
+      c -> $bug $ "Unexpected constructor: " <> show c
+
+infoToDeclaration :: T.Info -> Declaration
+infoToDeclaration = \case
+  T.TyConI d -> case d of
+    T.DataD _ _ vars cons _ -> adt vars cons
+    T.NewtypeD _ _ vars con _ -> adt vars [con]
+    d -> $bug $ "Unsupported dec: " <> show d
+  T.PrimTyConI _ arity _ -> Primitive
+  i -> $bug $ "Unsupported info: " <> show i
+  where
+    adt vars cons = ADT vars' cons' where
+      vars' = flip map vars $ \case
+        T.PlainTV n -> T.nameBase n
+        v -> $bug $ "Unexpected type of var: " <> show v
+      cons' = flip map cons $ \case
+        T.NormalC n ts -> (T.nameBase n, map (\(_, t) -> adaptType t) ts)
+        T.RecC n ts -> (T.nameBase n, map (\(_, _, t) -> adaptType t) ts)
+        T.InfixC (_, a) n (_, b) -> (T.nameBase n, [adaptType a, adaptType b])
+        c -> $bug $ "Unexpected constructor: " <> show c

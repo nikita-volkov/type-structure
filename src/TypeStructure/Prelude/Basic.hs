@@ -23,6 +23,7 @@ import Data.Monoid as Exports hiding (Any)
 import Data.Foldable as Exports
 import Data.Traversable as Exports hiding (for)
 import Data.Maybe as Exports
+import Data.Either as Exports
 import Data.List as Exports hiding (concat, foldr, foldl1, maximum, minimum, product, sum, all, and, any, concatMap, elem, foldl, foldr1, notElem, or, find, maximumBy, minimumBy, mapAccumL, mapAccumR, foldl')
 import Data.Tuple as Exports
 import Data.Ord as Exports (Down(..))

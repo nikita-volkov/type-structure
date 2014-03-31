@@ -42,12 +42,9 @@ library
     src
   other-modules:
     TypeStructure.TH.Analysis
-    TypeStructure.TH.Templates.Instance
-    TypeStructure.TH.Templates.TypeCon
-    TypeStructure.TH.Templates.Type
-    TypeStructure.TH.Templates.Declaration
+    TypeStructure.TH.Template
     TypeStructure.TH
-    TypeStructure.Graph
+    TypeStructure.Model
     TypeStructure.Class
     TypeStructure.Prelude.Basic
     TypeStructure.Prelude.Data

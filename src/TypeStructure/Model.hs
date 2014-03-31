@@ -1,4 +1,4 @@
-module TypeStructure.Graph where
+module TypeStructure.Model where
 
 import TypeStructure.Prelude.Basic
 import TypeStructure.Prelude.Data
@@ -8,7 +8,6 @@ type Graph = (Type, Dictionary)
 
 -- | 
 -- A type signature.
--- Can be used as an index.
 data Type =
   Type_App Type Type |
   Type_Var Var |
@@ -29,11 +28,11 @@ type TypeCon = (Namespace, Name)
 
 type Arity = Int
 
-type Dictionary = HashMap TypeCon Dec
+type Dictionary = HashMap TypeCon Declaration
 
-data Dec = 
-  Dec_ADT [Var] [Constructor] | 
-  Dec_Primitive 
+data Declaration = 
+  Declaration_ADT [Var] [Constructor] | 
+  Declaration_Primitive 
   deriving (Show, Ord, Eq)
 
 type Constructor = (Name, [Type])

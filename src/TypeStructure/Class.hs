@@ -1,7 +1,7 @@
 module TypeStructure.Class where
 
 import TypeStructure.Prelude.Basic
-import TypeStructure.Graph
+import TypeStructure.Model
 
 
 -- |
