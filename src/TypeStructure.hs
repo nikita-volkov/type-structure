@@ -59,6 +59,9 @@ derive ''Seq
 derive ''Maybe
 derive ''Either
 derive ''GHC.Exts.Any
+derive ''ThreadId
+derive ''TypeRep
+derive ''StableName
 
 -- tuples
 fmap join $ mapM derive $ map TH.tupleTypeName [2..24]
@@ -92,10 +95,12 @@ derive ''HashMap
 -- bytestring
 ---------------------
 derive ''ByteString
+derive ''LazyByteString
 
 -- text
 ---------------------
 derive ''Text
+derive ''LazyText
 
 -- time
 ---------------------
@@ -109,3 +114,8 @@ derive ''UTCTime
 derive ''UniversalTime
 derive ''DiffTime
 derive ''Day
+
+-- type-structure
+---------------------
+derive ''Type
+derive ''Declaration

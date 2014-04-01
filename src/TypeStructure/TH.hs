@@ -9,6 +9,8 @@ import qualified TypeStructure.TH.Model as M
 import qualified TypeStructure.TH.Template as Template
 
 
+-- |
+-- Automatically derive the instance of 'Class.TypeStructure' using Template Haskell.
 derive :: Name -> Q [Dec]
 derive name = do
   typeCon <- deriveTypeCon name
