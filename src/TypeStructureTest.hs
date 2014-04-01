@@ -13,5 +13,5 @@ test_differentStructuresDontEqual = do
 test_sameStructuresDoEqual = do
   assertEqual (graph (undefined :: Int)) (graph (undefined :: Int))
 
--- test_differentStructuresProduceDifferentHashes = do
---   assertNotEqual (hash $ graph (undefined :: Int16)) (hash $ graph (undefined :: Int8))
+test_differentStructuresProduceDifferentHashes = do
+  assertNotEqual (hash $ graph (undefined :: Int16)) (hash $ graph (undefined :: Int8))

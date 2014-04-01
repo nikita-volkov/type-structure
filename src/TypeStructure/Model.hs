@@ -34,7 +34,7 @@ type Name = Text
 type Namespace = Text
 
 -- | A dictionary of type declarations indexed by type constructors.
-type Dictionary = HashMap TypeCon Declaration
+type Dictionary = [(TypeCon, Declaration)]
 
 -- | A type declaration.
 data Declaration = 

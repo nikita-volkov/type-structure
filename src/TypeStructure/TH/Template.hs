@@ -8,7 +8,6 @@ import TypeStructure.TH.Model
 import qualified TypeStructure.Prelude.TH as T
 import qualified TypeStructure.Model as M
 import qualified TypeStructure.Class as C
-import qualified Data.HashMap.Strict as HashMap
 
 -- |
 -- 1.
@@ -121,10 +120,6 @@ renderInstance name vars tcs dictionaryRecords inheritedDictionaries =
               let
                 newRecords = $(
                     return $ T.ListE $ flip map dictionaryRecords $ \(tcs, ds) ->
-                      -- let 
-                      --   tc = return $ renderTypeCon tcs
-                      --   d = return $ renderDeclaration ds
-                      --   in T.purify $ [e| ($tc, $d) |]
                       T.purify 
                         [e|
                           let 
@@ -138,7 +133,7 @@ renderInstance name vars tcs dictionaryRecords inheritedDictionaries =
                   where
                     dicsOfTypeVars = $(return $ T.ListE $ map dictionaryExp varTypes)
                     dicsOfReferredTypes = $(return $ T.ListE $ map dictionaryExp inheritedDictionaries)
-                in foldr (\(k, v) -> HashMap.insert k v) inheritedDictionary newRecords
+                in foldr (\p -> (p:) . delete p) inheritedDictionary newRecords
             |]
             where
               dictionaryExp t = T.purify [e| ((snd . C.graph) (undefined :: $(return t))) |]
