@@ -41,7 +41,7 @@ analyzeReferredTypes name = do
   forM_ (referredTypes info) analyzeType
   where
     analyzeType t = do
-      (lift $ isInstance' ''Class.TypeStructure [t]) >>= \case
+      (lift $ isProperInstance' ''Class.TypeStructure [t]) >>= \case
         True -> void $ insert $ Right $ t
         False -> case t of
           AppT l r -> analyzeType l >> analyzeType r
@@ -70,7 +70,6 @@ conTypes = \case
   RecC n ts -> map (\(_, _, t) -> t) ts
   InfixC (_, l) n (_, r) -> [l, r]
   c -> $bug $ "Unexpected constructor: " <> show c
-
 
 adaptType :: Type -> M.Type
 adaptType = \case

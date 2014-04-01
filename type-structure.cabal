@@ -68,8 +68,10 @@ library
     -- debugging:
     loch-th == 0.2.*,
     placeholders == 0.1.*,
-    -- general:
+    -- template-haskell:
+    th-instance-reification > 0.1.0 && < 0.2,
     template-haskell,
+    -- general:
     base >= 4.5 && < 5
   default-extensions:
     Arrows
@@ -139,8 +141,10 @@ test-suite type-structure-htf-test-suite
     -- debugging:
     loch-th == 0.2.*,
     placeholders == 0.1.*,
-    -- general:
+    -- template-haskell:
+    th-instance-reification > 0.1.0 && < 0.2,
     template-haskell,
+    -- general:
     base >= 4.5 && < 5
   default-extensions:
     Arrows

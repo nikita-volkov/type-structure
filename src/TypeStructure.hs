@@ -18,7 +18,6 @@ import qualified TypeStructure.Prelude.TH as TH
 import qualified GHC.Exts
 
 
-
 -- base
 ---------------------
 derive ''(->)
@@ -41,6 +40,13 @@ derive ''Char
 derive ''Bool
 derive ''Ordering
 derive ''Fixed
+derive ''E0
+derive ''E1
+derive ''E2
+derive ''E3
+derive ''E6
+derive ''E9
+derive ''E12
 derive ''Ratio
 derive ''Last
 derive ''First
@@ -57,49 +63,49 @@ derive ''GHC.Exts.Any
 -- tuples
 fmap join $ mapM derive $ map TH.tupleTypeName [2..24]
 
--- -- transformers
--- ---------------------
--- derive ''Identity
+-- transformers
+---------------------
+derive ''Identity
 
--- -- vector
--- ---------------------
--- derive ''Vector
+-- vector
+---------------------
+derive ''Vector
 
--- -- array
--- ---------------------
--- derive ''UArray
--- derive ''Array
+-- array
+---------------------
+derive ''UArray
+derive ''Array
 
--- -- containers
--- ---------------------
--- derive ''IntSet
--- derive ''IntMap
--- derive ''Set
--- derive ''Tree
--- derive ''Map
+-- containers
+---------------------
+derive ''IntSet
+derive ''IntMap
+derive ''Set
+derive ''Tree
+derive ''Map
 
--- -- unordered-containers
--- ---------------------
--- derive ''HashSet
--- derive ''HashMap
+-- unordered-containers
+---------------------
+derive ''HashSet
+derive ''HashMap
 
--- -- bytestring
--- ---------------------
--- -- derive ''ByteString
+-- bytestring
+---------------------
+derive ''ByteString
 
--- -- text
--- ---------------------
--- derive ''Text
+-- text
+---------------------
+derive ''Text
 
--- -- time
--- ---------------------
--- derive ''AbsoluteTime
--- derive ''ZonedTime
--- derive ''LocalTime
--- derive ''TimeZone
--- derive ''TimeOfDay
--- derive ''NominalDiffTime
--- derive ''UTCTime
--- derive ''UniversalTime
--- derive ''DiffTime
--- derive ''Day
+-- time
+---------------------
+derive ''AbsoluteTime
+derive ''ZonedTime
+derive ''LocalTime
+derive ''TimeZone
+derive ''TimeOfDay
+derive ''NominalDiffTime
+derive ''UTCTime
+derive ''UniversalTime
+derive ''DiffTime
+derive ''Day
