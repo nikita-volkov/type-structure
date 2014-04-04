@@ -1,3 +1,75 @@
+-- |
+-- This library provides facilities to get a representation data of a type, 
+-- while traversing all the types it refers to down to the primitives. 
+-- Thus it transitively captures all the types involved, 
+-- which may even come from different libraries. 
+-- 
+-- The produced data structure is a graph, which has a 'Hashable' instance, 
+-- so it can be used to perform the matching aswell. 
+-- E.g., one can produce a \"version\" hash with it.
+-- 
+-- To provide support by this library for any type use the TemplateHaskell 
+-- to 'derive' an instance of the 'TypeStructure' class like this:
+-- 
+-- > {-# LANGUAGE TemplateHaskell #-}
+-- > 
+-- > import qualified TypeStructure
+-- > 
+-- > data AnyData = A | B Int | C Char
+-- > 
+-- > TypeStructure.derive ''AnyData
+-- 
+-- Following is a GHCi session, showing, how the library is supposed to be used:
+-- 
+-- > λ>import TypeStructure 
+-- 
+-- Construction of the type structure representation graph: 
+-- 
+-- > λ>graph (undefined :: Int)
+-- >
+-- > ( 
+-- >   Type_Con ("GHC.Types","Int"),
+-- >   [
+-- >     ( 
+-- >       ("GHC.Types","Int"),
+-- >       Declaration_ADT [] 
+-- >         [
+-- >           ("I#",[Type_Con ("GHC.Prim","Int#")])
+-- >         ] 
+-- >     ),
+-- >     (
+-- >       ("GHC.Prim","Int#"),
+-- >       Declaration_Primitive
+-- >     )
+-- >   ]
+-- > )
+-- 
+-- Graphs of different types are guaranteed to be different:
+-- 
+-- > λ>graph (undefined :: Int) /= graph (undefined :: Integer)
+-- >
+-- > True
+-- 
+-- Graphs of values of the same type are guaranteed to be the same:
+-- 
+-- > λ>graph True == graph False
+-- >
+-- > True    
+-- 
+-- Acquiring a hash of the typestructure:
+-- 
+-- > λ>import Data.Hashable
+-- >
+-- > λ>hash $ graph (undefined :: Int)
+-- >
+-- > 3224108341943761557
+-- 
+-- Hashes of different types should not be equal:
+-- 
+-- > λ>(hash $ graph (undefined :: Int)) /= (hash $ graph (undefined :: Integer))
+-- >
+-- > True
+-- 
 module TypeStructure
 (
   -- * Class
